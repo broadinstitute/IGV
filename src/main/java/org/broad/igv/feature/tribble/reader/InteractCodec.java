@@ -23,44 +23,51 @@
  * THE SOFTWARE.
  */
 
-package org.broad.igv.feature.tribble;
+package org.broad.igv.feature.tribble.reader;
 
+import htsjdk.tribble.Feature;
 import org.broad.igv.Globals;
-import org.broad.igv.feature.IGVFeature;
-import org.broad.igv.feature.UCSCSnpFeature;
+import org.broad.igv.bedpe.BedPEFeature;
+import org.broad.igv.bedpe.InteractFeature;
+import org.broad.igv.feature.*;
 import org.broad.igv.feature.genome.Genome;
+import org.broad.igv.feature.tribble.UCSCCodec;
+import org.broad.igv.logging.LogManager;
+import org.broad.igv.logging.Logger;
+import org.broad.igv.ui.color.ColorUtilities;
+import org.broad.igv.ui.util.MessageUtils;
+import org.broad.igv.util.StringUtils;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
+
 
 /**
- * Created by jrobinso on 5/26/15.
+ * Created by IntelliJ IDEA.
+ * User: jrobinso
+ * Date: Dec 20, 2009
+ * Time: 10:15:49 PM
  */
-public class UCSCSnpCodec extends UCSCCodec<IGVFeature> {
+public class InteractCodec extends UCSCCodec<InteractFeature> {
 
     private Genome genome;
 
-    public UCSCSnpCodec(Genome genome) {
-        super(UCSCSnpFeature.class);
+    public InteractCodec(Genome genome, FeatureType featureType) {
+        super(BasicFeature.class, featureType);
         this.genome = genome;
     }
 
-    @Override
-    public UCSCSnpFeature decode(String [] tokens) {
 
-        if (tokens.length < 25) return null;
-
-        String chr = tokens[1];
-        if (genome != null) {
-            chr = genome.getCanonicalChrName(chr);
-        }
-        int start = Integer.parseInt(tokens[2]);
-        int end = Integer.parseInt(tokens[3]);
-        return new UCSCSnpFeature(chr, start, end, tokens);
-
+    //@Override
+    public InteractFeature decode(String[] tokens) {
+        return InteractFeature.fromTokens(tokens, genome);
     }
 
-    @Override
     public boolean canDecode(String path) {
-        String fn = path.toLowerCase();
-        if(fn.endsWith(".gz")) fn = fn.substring(0, fn.length()-3);
-        return fn.toLowerCase().endsWith(".snp");
+        return true;
     }
 }
+
+

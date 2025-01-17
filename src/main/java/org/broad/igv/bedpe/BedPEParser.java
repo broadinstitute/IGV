@@ -35,8 +35,10 @@ public class BedPEParser {
         boolean col7isNumeric = true;   // Until proven otherwise
 
         Map<String, Color> colorCache = new HashMap<>();
-        List<BedPEFeature> features = new ArrayList<>();
+        List<BedPE> features = new ArrayList<>();
         BufferedReader br = null;
+
+        Map<String, Integer> featureCounts = new HashMap<>();
 
         try {
             br = ParsingUtils.openBufferedReader(locator.getPath());
@@ -112,6 +114,11 @@ public class BedPEParser {
 
                     BedPEFeature feature = new BedPEFeature(chr1, start1, end1, chr2, start2, end2);
 
+                    if(chr1.equals(chr2)) {
+                        Integer counts = featureCounts.containsKey(chr1) ? featureCounts.get(chr1) : 0;
+                        featureCounts.put(chr1, counts + 1);
+                    }
+
                     if (tokens.length > 6) {
                         feature.name = tokens[6];
                         col7isNumeric = col7isNumeric && isNumeric(tokens[6]);
@@ -123,7 +130,7 @@ public class BedPEParser {
                     if (tokens.length > 7) {
                         feature.scoreString = tokens[7];
                         try {
-                            feature.score = Double.parseDouble(tokens[7]);
+                            feature.score = Float.parseFloat(tokens[7]);
                         } catch (NumberFormatException e) {
                             feature.score = 0;
                         }
@@ -160,7 +167,7 @@ public class BedPEParser {
                             c = ColorUtilities.stringToColor(colorString);
                             colorCache.put(colorString, c);
                         }
-                        feature.color = c;
+                        feature.setColor(c);
                     }
 
                     if (thicknessColumn > 0 && tokens.length > thicknessColumn) {
@@ -168,6 +175,12 @@ public class BedPEParser {
                     }
 
                     // Skipping remaining fields for now
+
+
+                    if (!feature.getChr1().equals(feature.getChr2())) {
+                        // Add complement feature
+                        features.add(feature.getComplement());
+                    }
 
                     features.add(feature);
                 }
@@ -177,17 +190,23 @@ public class BedPEParser {
 
             // A hack to detect "interaction" bedpe files, which are not spec compliant.  Interaction score is column 7
             if (col7isNumeric) {
-                for (BedPEFeature f : features) {
-                    f.score = Double.parseDouble(f.name);
-                    f.scoreString = f.name;
-                    f.name = null;
+                for (BedPE bedpe : features) {
+                    if(bedpe instanceof BedPEFeature) {
+                        BedPEFeature f = (BedPEFeature) bedpe;
+                        f.score = Float.parseFloat(f.name);
+                        f.scoreString = f.name;
+                        f.name = null;
+                    }
                 }
                 if (type == DatasetType.UNKNOWN) {
                     type = DatasetType.CLUSTER;   // A guess
                 }
             }
 
-            return new Dataset(type, features);
+
+
+
+            return new Dataset(type, features, featureCounts);
         } finally {
             br.close();
         }
@@ -203,11 +222,13 @@ public class BedPEParser {
     public static class Dataset {
 
         public DatasetType type;
-        public List<BedPEFeature> features;
+        public List<BedPE> features;
+        public Map<String, Integer> featureCounts;
 
-        public Dataset(DatasetType type, List<BedPEFeature> features) {
+        public Dataset(DatasetType type, List<BedPE> features, Map<String, Integer> featureCounts) {
             this.type = type;
             this.features = features;
+            this.featureCounts = featureCounts;
         }
     }
 

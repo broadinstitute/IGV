@@ -26,9 +26,12 @@
 
 package org.broad.igv.feature;
 
+import org.broad.igv.feature.genome.ChromAlias;
+
 import java.awt.*;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Interface for features in IGV annotation tracks  (FeatureTrack and derived classes).
@@ -95,4 +98,7 @@ public interface IGVFeature extends LocusScore, IGVNamedFeature {
         return null;
     }
 
+   default Map<String, String> getAttributes() {
+        return Collections.EMPTY_MAP;
+   }
 }

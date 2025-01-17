@@ -26,10 +26,7 @@
 package org.broad.igv.feature.tribble;
 
 import org.broad.igv.Globals;
-import org.broad.igv.feature.PSLRecord;
-import org.broad.igv.feature.BasicFeature;
-import org.broad.igv.feature.Exon;
-import org.broad.igv.feature.Strand;
+import org.broad.igv.feature.*;
 import org.broad.igv.feature.genome.Genome;
 
 /**
@@ -60,12 +57,12 @@ import org.broad.igv.feature.genome.Genome;
  * 20. qStarts - Comma-separated list of starting positions of each block in query
  * 21. tStarts - Comma-separated list of starting positions of each block in target
  */
-public class PSLCodec extends UCSCCodec<BasicFeature> {
+public class PSLCodec extends UCSCCodec<IGVFeature> {
 
     Genome genome;
     boolean keepText;
 
-    public PSLCodec(){
+    public PSLCodec() {
         this(null);
     }
 
@@ -82,7 +79,6 @@ public class PSLCodec extends UCSCCodec<BasicFeature> {
 
     public PSLRecord decode(String line) {
 
-        PSLRecord f = null;
         try {
             if (line.trim().length() == 0 ||
                     line.startsWith("#") ||
@@ -95,16 +91,18 @@ public class PSLCodec extends UCSCCodec<BasicFeature> {
             }
 
             String[] tokens = Globals.tabPattern.split(line);
-            f = getPslRecord(tokens, genome);
-            if (f == null) return null;
+            return decode(tokens);
 
         } catch (NumberFormatException e) {
             return null;
         }
-
-
-        return f;
     }
+
+    public PSLRecord decode(String[] tokens) {
+            return getPslRecord(tokens, genome);
+    }
+
+
 
     /*
      "matches",

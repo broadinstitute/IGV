@@ -1,0 +1,6 @@
+track type=interact name="interact Example Two" description="Chromatin interactions" useScore=on maxHeightPixels=200:100:50 visibility=full
+browser position chr3:64,562,440-64,642,288
+chr3    64496901        64584378        .       375     3       .       0       chr3    64496901        64498901        .       .       chr3    64581378        64584378        .       .
+chr3    64568052        64569134        .       400     3       .       0       chr20   52552477        52556062        .       .       chr3    64568052        64569134        .       .
+chr3    64596901        64615378        .       175     3       .       0       chr3    64596901        64600855        .       .       chr3    64612677        64615378        .       .
+chr3    64623042        64636663        .       800     4       .       0       chr3    64623042        64625153        .       .       chr3    64632961        64636663        .       .

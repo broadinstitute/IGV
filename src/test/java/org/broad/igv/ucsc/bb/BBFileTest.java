@@ -1,6 +1,7 @@
 package org.broad.igv.ucsc.bb;
 
 import org.broad.igv.feature.BasicFeature;
+import org.broad.igv.feature.IGVFeature;
 import org.broad.igv.util.TestUtils;
 import org.junit.Test;
 
@@ -82,12 +83,12 @@ public class BBFileTest {
 
         // There are 5 extra indexes, 1 for each alias
         String ncbiName = "3";
-        BasicFeature f1 = bbReader.search(ncbiName);
+        IGVFeature f1 = bbReader.search(ncbiName);
         assertNotNull(f1);
         assertEquals(ncbiName, f1.getAttribute("ncbi"));
 
         String ucscName = "chr2";
-        BasicFeature f2 =  bbReader.search(ucscName);
+        IGVFeature f2 =  bbReader.search(ucscName);
         assertEquals(ucscName, f2.getAttribute("ucsc"));
 
         assertNull(bbReader.search("zzzz"));
@@ -102,16 +103,28 @@ public class BBFileTest {
 
         // Search by name, which is the index parameter, does not require trix
         String name = "NP_389226.1";
-        BasicFeature f =  bbReader.search(name);
+        IGVFeature f =  bbReader.search(name);
         assertEquals(name, f.getName());
 
 
         // Search by alternate name,  does require trix
         String name2 = "ykoX";
-        BasicFeature f2 =  bbReader.search(name2);
+        IGVFeature f2 =  bbReader.search(name2);
         assertEquals(name, f2.getName());
 
         assertNull(bbReader.search("zzzz"));
+    }
+
+    /**
+     * Test a BW file with an unusual layout (chromTree after full data).
+     */
+    @Test
+    public void testBigInteract() throws IOException {
+        String bbFile = TestUtils.DATA_DIR + "bb/interactExample3.inter.bb";
+        BBFile reader = new BBFile(bbFile, null);
+        reader.readHeader();
+        String [] chrNames = reader.getChromosomeNames();
+        assertEquals(6, chrNames.length);
     }
 
 

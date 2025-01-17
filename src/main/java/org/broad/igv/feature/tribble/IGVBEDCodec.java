@@ -34,7 +34,6 @@ import org.broad.igv.ui.util.MessageUtils;
 import org.broad.igv.util.StringUtils;
 import htsjdk.tribble.Feature;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,8 +55,6 @@ public class IGVBEDCodec extends UCSCCodec<BasicFeature> {
 
 
     private Genome genome;
-    private Pattern delimiter = null;
-
     private int maxColumnCount = Integer.MAX_VALUE;
 
     public IGVBEDCodec() {
@@ -73,6 +70,12 @@ public class IGVBEDCodec extends UCSCCodec<BasicFeature> {
         this.genome = genome;
     }
 
+    @Override
+    public BasicFeature decode(String nextLine) {
+        BasicFeature feature = super.decode(nextLine);
+        feature.setRepresentation(nextLine);
+        return feature;
+    }
 
     //@Override
     public BasicFeature decode(String[] tokens) {
@@ -280,35 +283,6 @@ public class IGVBEDCodec extends UCSCCodec<BasicFeature> {
     public static boolean isCoding(BasicFeature feature) {
         return feature.hasExons() && feature.getThickStart() > feature.getStart() && feature.getThickEnd() < feature.getEnd()
                 && feature.getStrand() != Strand.NONE;
-    }
-
-    private String[] tokens = new String[50];
-
-    @Override
-    public BasicFeature decode(String nextLine) {
-
-        String trimLine = nextLine.trim();
-        if (trimLine.length() == 0) {
-            return null;
-        }
-
-        if (nextLine.startsWith("#") || nextLine.startsWith("track") || nextLine.startsWith("browser")) {
-            return null;
-        }
-
-        // Bed files can be tab or whitespace delimited
-        if (delimiter == null) {
-            if(featureType == FeatureType.BED_METHYL) {
-                delimiter = Globals.whitespacePattern;
-            } else {
-                delimiter = trimLine.contains("\t") ? Globals.multiTabPattern : Globals.whitespacePattern;
-            }
-        }
-
-        tokens = delimiter.split(trimLine);
-        BasicFeature feature = decode(tokens);
-        feature.setRepresentation(nextLine);
-        return feature;
     }
 
 

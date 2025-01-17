@@ -38,15 +38,15 @@ public class PEBlockRenderer implements BedPERenderer {
 
 
                 if (bedPE.isSameChr()) {
-                    BedPEFeature feature = bedPE.get();
-                    int ps1 = (int) ((feature.start1 - origin) / locScale);
-                    int pe1 = (int) ((feature.end1 - origin) / locScale);
+                    BedPE feature = bedPE;
+                    int ps1 = (int) ((feature.getStart1() - origin) / locScale);
+                    int pe1 = (int) ((feature.getEnd1() - origin) / locScale);
                     if (pe1 >= trackRectangle.getX() && ps1 <= trackRectangle.getMaxX()) {
                         drawBlock(ps1, pe1, blockY, g);
                     }
 
-                    int ps2 = (int) ((feature.start2 - origin) / locScale);
-                    int pe2 = (int) ((feature.end2 - origin) / locScale);
+                    int ps2 = (int) ((feature.getStart2() - origin) / locScale);
+                    int pe2 = (int) ((feature.getEnd2() - origin) / locScale);
                     if (pe2 >= trackRectangle.getX() && ps2 <= trackRectangle.getMaxX()) {
                         drawBlock(ps2, pe2, blockY, g);
                     }

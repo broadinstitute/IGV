@@ -72,7 +72,7 @@ field	example	SQL type	info	description
 /**
  *
  */
-public class DGVCodec extends UCSCCodec<BasicFeature>  {
+public class DGVCodec extends UCSCCodec<IGVFeature>  {
 
     static final Pattern BR_PATTERN = Pattern.compile("<br>");
     static final Pattern EQ_PATTERN = Pattern.compile("=");

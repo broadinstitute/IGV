@@ -25,7 +25,10 @@
 
 package org.broad.igv.feature.tribble;
 
+import org.broad.igv.Globals;
+import org.broad.igv.feature.BasicFeature;
 import org.broad.igv.feature.FeatureType;
+import org.broad.igv.feature.IGVFeature;
 import org.broad.igv.renderer.SpliceJunctionRenderer;
 import org.broad.igv.track.TrackProperties;
 import org.broad.igv.track.TrackType;
@@ -35,17 +38,21 @@ import htsjdk.tribble.Feature;
 import htsjdk.tribble.exception.CodecLineParsingException;
 import htsjdk.tribble.readers.LineIterator;
 
+import java.util.regex.Pattern;
+
 /**
  * @author jrobinso
  * @date Aug 5, 2010
  */
-public abstract class UCSCCodec<T extends Feature> extends AsciiFeatureCodec<T> {
+public abstract class UCSCCodec<T extends IGVFeature> extends AsciiFeatureCodec<T> {
 
     GFFCodec.GFF3Helper tagHelper = new GFFCodec.GFF3Helper();
     protected boolean gffTags = false;
 
     FeatureFileHeader header;
     FeatureType featureType;
+
+    private Pattern delimiter = null;
 
     protected UCSCCodec(Class myClass) {
         super(myClass);
@@ -139,4 +146,31 @@ public abstract class UCSCCodec<T extends Feature> extends AsciiFeatureCodec<T> 
         this.featureType = featureType;
     }
 
+    @Override
+    public T decode(String nextLine) {
+
+        String trimLine = nextLine.trim();
+        if (trimLine.length() == 0) {
+            return null;
+        }
+
+        if (nextLine.startsWith("#") || nextLine.startsWith("track") || nextLine.startsWith("browser")) {
+            return null;
+        }
+
+        // Bed files can be tab or whitespace delimited
+        if (delimiter == null) {
+            if(featureType == FeatureType.BED_METHYL) {
+                delimiter = Globals.whitespacePattern;
+            } else {
+                delimiter = trimLine.contains("\t") ? Globals.multiTabPattern : Globals.whitespacePattern;
+            }
+        }
+
+        String [] tokens = delimiter.split(trimLine);
+        T feature = decode(tokens);
+        return feature;
+    }
+
+    public abstract T decode(String[] tokens);
 }

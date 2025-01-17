@@ -180,7 +180,7 @@ public class ColorUtilities {
 
     public static Color stringToColor(String string, Color defaultColor) {
 
-        if (string == null) return defaultColor;
+        if (string == null || string.equals(".")) return defaultColor;
 
         try {
             Color c = stringToColorNoDefault(string);

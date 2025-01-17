@@ -160,6 +160,8 @@ public class WiggleParser {
 
             if (type == Type.EXPR) {
                 reader.readLine(); // Skip header line
+            } else if(type == null) {
+                type = Type.BED_GRAPH;   // Until proven otherwise (e.g. by fixedStep line)
             }
 
             int position = -1;
@@ -172,9 +174,7 @@ public class WiggleParser {
                     // Skip
                 }
 
-
-                if (nextLine.startsWith("track") && type != Type.CPG) {
-                    type = Type.BED_GRAPH;
+                if (nextLine.startsWith("track")) {
                     ParsingUtils.parseTrackLine(nextLine, dataset.getTrackProperties());
                     if (dataset.getTrackProperties().getBaseCoord() == TrackProperties.BaseCoord.ZERO) {
                         this.startBase = 0;

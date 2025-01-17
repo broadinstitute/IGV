@@ -3,6 +3,7 @@ package org.broad.igv.ucsc.bb;
 import htsjdk.samtools.seekablestream.SeekableStream;
 import org.broad.igv.data.BasicScore;
 import org.broad.igv.feature.BasicFeature;
+import org.broad.igv.feature.IGVFeature;
 import org.broad.igv.feature.LocusScore;
 import org.broad.igv.feature.genome.ChromAlias;
 import org.broad.igv.feature.genome.Genome;
@@ -427,7 +428,7 @@ public class BBFile {
      * @returns {Promise<void>}
      */
 
-    public BasicFeature search(String term) throws IOException {
+    public IGVFeature search(String term) throws IOException {
 
         if (this.header == null) {
             this.readHeader();
@@ -454,12 +455,12 @@ public class BBFile {
                 byte[] buffer = new byte[size];
                 is.seek(start);
                 is.readFully(buffer);
-                List<BasicFeature> features = decodeFeatures(buffer, -1, -1, -1);
+                List<IGVFeature> features = decodeFeatures(buffer, -1, -1, -1);
 
                 // Filter features to those matching term
                 final String searchTerm = term;
 
-                BasicFeature largest = features.stream().filter(f -> {
+                IGVFeature largest = features.stream().filter(f -> {
                     return f.getName().equalsIgnoreCase(searchTerm) || f.getAttributes().values().stream().anyMatch(v -> v.equalsIgnoreCase(searchTerm));
                 }).reduce((f1, f2) -> {
                     int l1 = f1.getEnd() - f1.getStart();
@@ -473,8 +474,8 @@ public class BBFile {
         return null;
     }
 
-    List<BasicFeature> decodeFeatures(byte[] buffer, int chrIdx, int start, int end) {
-        List<BasicFeature> features = new ArrayList<>();
+    List<IGVFeature> decodeFeatures(byte[] buffer, int chrIdx, int start, int end) {
+        List<IGVFeature> features = new ArrayList<>();
         byte[] uncompressed;
         if (this.header.uncompressBuffSize > 0) {
             uncompressed = (new CompressionUtils()).decompress(buffer, this.header.uncompressBuffSize);
@@ -498,7 +499,7 @@ public class BBFile {
 
             String chr = getChrForId(chromId);
             final BedData bedData = new BedData(chr, chromStart, chromEnd, restOfFields);
-            final BasicFeature feature = bedCodec.decode(bedData);
+            final IGVFeature feature = bedCodec.decode(bedData);
             features.add(feature);
         }
         return features;

@@ -28,6 +28,7 @@ package org.broad.igv.feature.tribble;
 import org.broad.igv.Globals;
 import org.broad.igv.feature.BasicFeature;
 import org.broad.igv.feature.Exon;
+import org.broad.igv.feature.IGVFeature;
 import org.broad.igv.feature.Strand;
 import org.broad.igv.feature.genome.Genome;
 
@@ -37,7 +38,7 @@ import java.util.List;
  * @author Jim Robinson
  * @date 11/19/11
  */
-public class UCSCGeneTableCodec extends UCSCCodec<BasicFeature> {
+public class UCSCGeneTableCodec extends UCSCCodec<IGVFeature> {
 
     private int nameColumn = 0;
     private int idColumn = 1;
@@ -120,6 +121,13 @@ public class UCSCGeneTableCodec extends UCSCCodec<BasicFeature> {
 
         line = line.replaceAll("\"", "");
         String[] tokens = Globals.tabPattern.split(line);
+        BasicFeature gene = decode(tokens);
+        gene.setRepresentation(line);
+        return gene;
+    }
+
+    public BasicFeature decode(String[] tokens) {
+
         int tokenCount = tokens.length;
 
         if (tokenCount <= strandColumn) {
@@ -152,7 +160,7 @@ public class UCSCGeneTableCodec extends UCSCCodec<BasicFeature> {
         }
 
         BasicFeature gene = new BasicFeature(chr, start, end, strand);
-        gene.setRepresentation(line);
+
 
         gene.setName(name);
         gene.setIdentifier(identifier);
@@ -162,7 +170,7 @@ public class UCSCGeneTableCodec extends UCSCCodec<BasicFeature> {
             gene.setThickEnd(Integer.parseInt(tokens[7]));
         }
 
-        if(scoreColumn > 0 && tokenCount > scoreColumn) {
+        if (scoreColumn > 0 && tokenCount > scoreColumn) {
             gene.setScore((float) Double.parseDouble(tokens[scoreColumn]));
         }
 

@@ -70,8 +70,8 @@ public class NestedArcRenderer implements BedPERenderer{
 
                     if (bedPE.isSameChr()) {
 
-                        BedPEFeature feature = bedPE.get();
-                        Color fcolor = feature.color == null ? trackColor : feature.color;
+                        BedPE feature = bedPE;
+                        Color fcolor = feature.getColor() == null ? trackColor : feature.getColor();
 
                         double pixelStart = (feature.getMidStart() - origin) / locScale;
                         double pixelEnd = (feature.getMidEnd() - origin) / locScale;
@@ -113,7 +113,7 @@ public class NestedArcRenderer implements BedPERenderer{
                         feature.setShape(new NAShape(xc, yc, r));
 
                     } else {
-                        Color fcolor = bedPE.get().color == null ? Color.black : bedPE.get().color;
+                        Color fcolor = bedPE.getColor() == null ? Color.black : bedPE.getColor();
                         g.setColor(fcolor);
                         int h = trackRectangle.height / 2;
                         double ps = ((bedPE.getStart() + bedPE.getEnd()) / 2 - origin) / locScale;

@@ -1,9 +1,12 @@
 package org.broad.igv.bedpe;
 
 import org.broad.igv.track.RenderContext;
+import org.broad.igv.ui.util.MessageUtils;
+import org.broad.igv.util.Pair;
 
 import java.awt.*;
 import java.awt.geom.Arc2D;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +39,27 @@ public class ProportionalArcRenderer implements BedPERenderer {
                 g.setStroke(new BasicStroke(track.thickness));
             }
 
+            // Filter features to in-view
+            List<BedPE> filteredFeatures = new ArrayList<>();
             for (BedPE bedPE : features) {
+                double p1 = (bedPE.getStart() - origin) / locScale;
+                double p2 = (bedPE.getEnd() - origin) / locScale;
+                if (p2 >= trackRectangle.getX() && p1 <= trackRectangle.getMaxX()) {
+                    // Optionally filter arcs with one or both ends out of view
+                    double pixelStart = (bedPE.getMidStart() - origin) / locScale;
+                    double pixelEnd = (bedPE.getMidEnd() - origin) / locScale;
+                    if (arcOption == InteractionTrack.ArcOption.ONE_END) {
+                        if (pixelStart < trackRectangle.x && pixelEnd > trackRectangle.x + trackRectangle.width)
+                            continue;
+                    } else if (arcOption == InteractionTrack.ArcOption.BOTH_ENDS) {
+                        if (pixelStart < trackRectangle.x || pixelEnd > trackRectangle.x + trackRectangle.width)
+                            continue;
+                    }
+                    filteredFeatures.add(bedPE);
+                }
+            }
+
+            for (BedPE bedPE : filteredFeatures) {
 
                 double p1 = (bedPE.getStart() - origin) / locScale;
                 double p2 = (bedPE.getEnd() - origin) / locScale;
@@ -54,22 +77,15 @@ public class ProportionalArcRenderer implements BedPERenderer {
 
                     if (bedPE.isSameChr()) {
 
-                        BedPEFeature feature = bedPE.get();
+                        BedPE feature = bedPE;
 
-                        Color fcolor = feature.color == null ? trackColor : feature.color;
+                        Color fcolor = feature.getColor() == null ? trackColor : feature.getColor();
                         if (fcolor != null) {
                             g.setColor(fcolor);
                         }
 
                         double pixelStart = (feature.getMidStart() - origin) / locScale;
                         double pixelEnd = (feature.getMidEnd() - origin) / locScale;
-
-                        // Optionally filter arcs with one or both ends out of view
-                        if(arcOption == InteractionTrack.ArcOption.ONE_END) {
-                            if(pixelStart < trackRectangle.x && pixelEnd > trackRectangle.x + trackRectangle.width) continue;
-                        } else if(arcOption == InteractionTrack.ArcOption.BOTH_ENDS) {
-                            if(pixelStart < trackRectangle.x || pixelEnd > trackRectangle.x + trackRectangle.width) continue;
-                        }
 
                         int w = (int) (pixelEnd - pixelStart);
                         if (w < 3) {
@@ -94,17 +110,16 @@ public class ProportionalArcRenderer implements BedPERenderer {
                         g.setColor(shadedColor);
                         g.fill(arcPath);
 
-                        bedPE.setShape(new PAShape(pixelStart + w/2, y + h, w/2, h));
+                        bedPE.setShape(new PAShape(pixelStart + w / 2, y + h, w / 2, h));
 
                     } else {
-                        Color fcolor = bedPE.get().color == null ? Color.black : bedPE.get().color;
+                        Color fcolor = bedPE.getColor() == null ? Color.black : bedPE.getColor();
                         g.setColor(fcolor);
                         double ps = ((bedPE.getStart() + bedPE.getEnd()) / 2 - origin) / locScale;
                         int yBase = direction == UP ? trackRectangle.y + trackRectangle.height - h : trackRectangle.y + gap;
                         g.drawLine((int) ps, yBase, (int) ps, yBase + h);
                     }
-                }
-                else {
+                } else {
                     bedPE.setShape(null);
                 }
             }
@@ -126,7 +141,7 @@ public class ProportionalArcRenderer implements BedPERenderer {
     }
 
     //(x-h)^2/a^2 + (y-k)^2/b^2 <= 1
-    public static class PAShape implements BedPEShape{
+    public static class PAShape implements BedPEShape {
 
         double h;   //xc
         double k;   //yc
@@ -136,8 +151,8 @@ public class ProportionalArcRenderer implements BedPERenderer {
         public PAShape(double h, double k, double a, double b) {
             this.h = h;
             this.k = k;
-            this.a2 = a*a;
-            this.b2 = b*b;
+            this.a2 = a * a;
+            this.b2 = b * b;
         }
 
         @Override
@@ -145,8 +160,8 @@ public class ProportionalArcRenderer implements BedPERenderer {
 
             double dx = x - h;
             double dy = y - k;
-            double e = dx*dx / a2 + dy*dy / b2;
-            return  e < 1.0;
+            double e = dx * dx / a2 + dy * dy / b2;
+            return e < 1.0;
         }
     }
 }

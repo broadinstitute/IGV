@@ -39,7 +39,7 @@ import java.util.List;
 /**
  * @author jrobinso
  */
-abstract public class AbstractFeature implements IGVFeature, htsjdk.tribble.Feature {
+abstract public class AbstractFeature implements IGVFeature {
 
     private static Logger log = LogManager.getLogger(AbstractFeature.class);
     protected Strand strand = Strand.NONE;

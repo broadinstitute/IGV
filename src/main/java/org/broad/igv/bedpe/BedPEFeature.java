@@ -1,28 +1,35 @@
 package org.broad.igv.bedpe;
 
+import org.broad.igv.feature.BasicFeature;
+import org.broad.igv.feature.IGVFeature;
+
 import java.awt.*;
 import java.util.Map;
 
 /**
  * Created by jrobinso on 6/29/18.
  */
-public class BedPEFeature implements BedPE {
+public class BedPEFeature implements BedPE  {
 
-    public String chr1;
-    public int start1;
-    public int end1;
-    public String chr2;
-    public int start2;
-    public int end2;
-    String name;
-    String scoreString = "";
-    double score;
-    Color color;
-    int thickness = 1;
-    String type;
+    protected String chr1;
+    protected int start1;
+    protected int end1;
+
+    protected String chr2;
+    protected int start2;
+    protected int end2;
+    protected String name;
+    protected String scoreString = "";
+    protected float score;
+    protected Color color;
+    protected int thickness = 1;
+    protected String type;
     Map<String, String> attributes;
-    int row;
     BedPEShape shape;
+    private boolean isComplement = false;
+
+    public BedPEFeature() {
+    }
 
     public BedPEFeature(String chr1, int start1, int end1, String chr2, int start2, int end2) {
         this.chr1 = chr1;
@@ -33,15 +40,24 @@ public class BedPEFeature implements BedPE {
         this.end2 = end2;
     }
 
-    public BedPEFeature get() {
-        return this;
+    public BedPEFeature getComplement() {
+        BedPEFeature complement = new BedPEFeature(chr2, start2, end2, chr1, start1, end1);
+        complement.name = name;
+        complement.scoreString = scoreString;
+        complement.score = score;
+        complement.color = color;
+        complement.thickness = thickness;
+        complement.type = type;
+        complement.attributes = attributes;
+        complement.isComplement = true;
+        return complement;
     }
 
     public String getChr() {
         if(isSameChr()) {
             return chr1;
         } else {
-            return null;
+            return chr1 + " " + chr2;
         }
     }
 
@@ -62,24 +78,18 @@ public class BedPEFeature implements BedPE {
     }
 
     @Override
-    public double getScore() {
+    public boolean isComplement() {
+        return this.isComplement;
+    }
+
+    @Override
+    public float getScore() {
         return score;
     }
 
     public boolean isSameChr() {
         return chr1.equals(chr2);
     }
-
-    @Override
-    public void setRow(int row) {
-        this.row = row;
-    }
-
-    @Override
-    public int getRow() {
-        return row;
-    }
-
     @Override
     public Color getColor() {
         return color;
@@ -126,8 +136,36 @@ public class BedPEFeature implements BedPE {
         return buf.toString();
     }
 
+    public String getChr1() {
+        return chr1;
+    }
+
+    public int getStart1() {
+        return start1;
+    }
+
+    public int getEnd1() {
+        return end1;
+    }
+
+    public String getChr2() {
+        return chr2;
+    }
+
+    public int getStart2() {
+        return start2;
+    }
+
+    public int getEnd2() {
+        return end2;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
     @Override
-    public double getCenterDistance() {
-        return Math.abs((start1 + end1) / 2.0 - (start2 + end2)  / 2.0);
+    public String getName() {
+        return name;
     }
 }

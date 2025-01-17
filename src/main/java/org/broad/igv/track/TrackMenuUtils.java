@@ -29,6 +29,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import htsjdk.tribble.Feature;
 import org.apache.commons.math3.stat.StatUtils;
+import org.broad.igv.bedpe.InteractionTrack;
 import org.broad.igv.logging.*;
 import org.broad.igv.Globals;
 import org.broad.igv.data.AbstractDataSource;
@@ -1032,7 +1033,7 @@ public class TrackMenuUtils {
 
         Collection<Track> featureTracks = new ArrayList(selectedTracks.size());
         for (Track t : selectedTracks) {
-            if (t instanceof FeatureTrack) {
+            if (t instanceof FeatureTrack || t instanceof InteractionTrack) {
                 featureTracks.add(t);
             }
         }

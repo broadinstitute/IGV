@@ -53,7 +53,6 @@ public class BasicFeature extends AbstractFeature {
     private int thickEnd;
     private int thickStart;
 
-
     String[] parentIds;
     String link;
 

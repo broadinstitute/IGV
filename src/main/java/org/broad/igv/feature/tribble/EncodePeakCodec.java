@@ -66,18 +66,7 @@ public class EncodePeakCodec extends UCSCCodec {
     }
 
     @Override
-    public BasicFeature decode(String nextLine) {
-
-
-        if (nextLine.trim().length() == 0) {
-            return null;
-        }
-
-        if (nextLine.startsWith("#") || nextLine.startsWith("track") || nextLine.startsWith("browser")) {
-            return null;
-        }
-
-        String[] tokens = Globals.tabPattern.split(nextLine);
+    public BasicFeature decode(String [] tokens) {
 
         int tokenCount = tokens.length;
 

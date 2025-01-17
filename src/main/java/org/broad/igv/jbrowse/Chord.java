@@ -24,18 +24,16 @@ class Chord {
     private Chord() {
     }
 
-    public static Chord fromBedPE(BedPE bedPE) {
-
-        BedPEFeature f = bedPE.get();
+    public static Chord fromBedPE(BedPE f) {
 
         Chord c = new Chord();
-        String chr1 = shortName(f.chr1);
-        String chr2 = shortName(f.chr2);
-        c.uniqueId = chr1 + ":" + f.start1 + "-" + f.end1 + "_" + chr2 + ":" + f.start2 + "-" + f.end2;
+        String chr1 = shortName(f.getChr1());
+        String chr2 = shortName(f.getChr2());
+        c.uniqueId = chr1 + ":" + f.getStart1() + "-" + f.getEnd1() + "_" + chr2 + ":" + f.getStart2() + "-" + f.getEnd2();
         c.refName = chr1;
-        c.start = f.start1;
-        c.end = f.end1;
-        c.mate = new Mate(chr2, f.start2, f.end2);
+        c.start = f.getStart1();
+        c.end = f.getEnd1();
+        c.mate = new Mate(chr2, f.getStart2(), f.getEnd2());
         return c;
     }
 
